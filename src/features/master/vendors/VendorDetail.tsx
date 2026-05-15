@@ -45,6 +45,8 @@ export function VendorDetail() {
       <PageHeader
         title={vendor.legal_name}
         description={vendor.gstin}
+        backTo="/master/vendors"
+        backLabel="Vendors"
         actions={
           <Link to={`/master/vendors/${id}/edit`} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--color-border-soft-200)] text-sm text-[var(--color-text-sub-600)] hover:bg-[var(--color-bg-soft-200)] transition">
             <RiPencilLine className="w-4 h-4" /> Edit

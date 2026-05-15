@@ -16,13 +16,13 @@ import { RiAddLine, RiDeleteBinLine } from "@remixicon/react"
 import type { ApprovalEvent } from "@/lib/types"
 
 const lineSchema = z.object({
-  part_id: z.string().uuid(),
+  part_id: z.string().min(1, "Please select a part"),
   qty: z.coerce.number<number>().min(1),
-  warehouse_id: z.string().uuid(),
+  warehouse_id: z.string().min(1, "Please select a warehouse"),
 })
 
 const schema = z.object({
-  vehicle_id: z.string().uuid(),
+  vehicle_id: z.string().min(1, "Please select a vehicle"),
   urgency: z.enum(["Breakdown", "Scheduled"]),
   reason: z.string().min(5),
   lines: z.array(lineSchema).min(1, "Add at least one part"),
@@ -72,7 +72,7 @@ export function IndentForm() {
 
   const { register, handleSubmit, reset, control, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { urgency: "Scheduled", lines: [{ part_id: "", qty: 1, warehouse_id: "" }] },
+    defaultValues: { vehicle_id: "", urgency: "Scheduled", lines: [{ part_id: "", qty: 1, warehouse_id: "" }] },
   })
 
   const { fields, append, remove } = useFieldArray({ control, name: "lines" })
@@ -121,7 +121,12 @@ export function IndentForm() {
 
   return (
     <div className="space-y-5 max-w-3xl">
-      <PageHeader title={isEdit ? `Indent IND-${id?.slice(0, 8).toUpperCase()}` : "Raise Indent"} actions={isEdit && <StatusBadge status={indent?.status ?? "Draft"} />} />
+      <PageHeader
+        title={isEdit ? `Indent IND-${id?.slice(0, 8).toUpperCase()}` : "Raise Indent"}
+        backTo="/outward/indents"
+        backLabel="Indents"
+        actions={isEdit && <StatusBadge status={indent?.status ?? "Draft"} />}
+      />
       <form onSubmit={handleSubmit((v) => mutation.mutate(v))} className="space-y-5">
         <FormCard title="Request Details">
           <div className="grid grid-cols-2 gap-4">

@@ -14,8 +14,8 @@ export function QCQueue() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("grns")
-        .select("*, warehouses(name), purchase_orders(vendors(legal_name))")
-        .in("status", ["Received", "Pending QC"])
+        .select("*, grn_no, warehouses(name), purchase_orders(vendors(legal_name))")
+        .in("status", ["QC_Pending", "Received"])
         .order("grn_date", { ascending: true })
       if (error) throw error
       return data
@@ -23,7 +23,7 @@ export function QCQueue() {
   })
 
   const columns: ColumnDef<any>[] = [
-    { accessorKey: "id", header: "GRN Ref.", cell: ({ getValue }) => <span className="font-mono text-xs">GRN-{(getValue() as string).slice(0, 8).toUpperCase()}</span> },
+    { accessorKey: "grn_no", header: "GRN Ref.", cell: ({ getValue, row }) => <span className="font-mono text-xs">{(getValue() as string) ?? `GRN-${(row.original.id as string).slice(0, 8).toUpperCase()}`}</span> },
     { id: "vendor", header: "Vendor", cell: ({ row }) => row.original.purchase_orders?.vendors?.legal_name ?? "—" },
     { id: "warehouse", header: "Warehouse", cell: ({ row }) => row.original.warehouses?.name ?? "—" },
     { accessorKey: "grn_date", header: "Received On", cell: ({ getValue }) => formatDate(getValue() as string) },

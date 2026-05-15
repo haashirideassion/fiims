@@ -18,14 +18,14 @@ import { RiAddLine, RiDeleteBinLine } from "@remixicon/react"
 import type { ApprovalEvent } from "@/lib/types"
 
 const lineSchema = z.object({
-  part_id: z.string().uuid(),
+  part_id: z.string().min(1, "Please select a part"),
   qty: z.coerce.number<number>().min(1),
   suggested_vendor_id: z.string().optional(),
   notes: z.string().optional(),
 })
 
 const schema = z.object({
-  warehouse_id: z.string().uuid(),
+  warehouse_id: z.string().min(1, "Please select a warehouse"),
   urgency: z.enum(["Normal", "Urgent", "Critical"]),
   lines: z.array(lineSchema).min(1, "Add at least one item"),
 })
@@ -71,7 +71,7 @@ export function PRForm() {
 
   const { register, handleSubmit, reset, control, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { urgency: "Normal", warehouse_id: scopedWarehouseId() ?? "", lines: [{ part_id: "", qty: 1, notes: "" }] },
+    defaultValues: { warehouse_id: scopedWarehouseId() ?? "", urgency: "Normal", lines: [{ part_id: "", qty: 1, notes: "" }] },
   })
 
   const { fields, append, remove } = useFieldArray({ control, name: "lines" })
@@ -152,7 +152,7 @@ export function PRForm() {
             {fields.map((field, i) => (
               <div key={field.id} className="grid grid-cols-12 gap-3 items-end">
                 <div className="col-span-6">
-                  <Field label={i === 0 ? "Part" : ""}>
+                  <Field label={i === 0 ? "Part" : ""} error={(errors.lines?.[i] as any)?.part_id?.message}>
                     <Select {...register(`lines.${i}.part_id`)} disabled={isReadOnly}>
                       <option value="">Select part…</option>
                       {parts.map((p: any) => <option key={p.id} value={p.id}>{p.sku} — {p.name}</option>)}

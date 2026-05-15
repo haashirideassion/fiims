@@ -14,7 +14,7 @@ import { toast } from "sonner"
 import { RiAddLine, RiDeleteBinLine, RiPrinterLine } from "@remixicon/react"
 
 const lineSchema = z.object({
-  po_line_id: z.string().uuid(),
+  po_line_id: z.string().min(1, "Please select a PO line"),
   received_qty: z.coerce.number<number>().min(0),
   batch_no: z.string().optional(),
   mfg_date: z.string().optional(),
@@ -24,8 +24,8 @@ const lineSchema = z.object({
 })
 
 const schema = z.object({
-  po_id: z.string().uuid(),
-  warehouse_id: z.string().uuid(),
+  po_id: z.string().min(1, "Please select a purchase order"),
+  warehouse_id: z.string().min(1, "Please select a warehouse"),
   grn_date: z.string(),
   lines: z.array(lineSchema).min(1),
 })
@@ -41,7 +41,12 @@ export function GRNForm() {
   const { data: openPOs = [] } = useQuery({
     queryKey: ["open-pos"],
     queryFn: async () => {
-      const { data } = await supabase.from("purchase_orders").select("id, vendors(legal_name)").eq("status", "Issued")
+      // Include Approved and Issued POs (eligible for goods receipt), plus Partially Received
+      const { data } = await supabase
+        .from("purchase_orders")
+        .select("id, po_no, vendors(legal_name)")
+        .in("status", ["Approved", "Issued", "Partially Received"])
+        .order("po_no", { ascending: false })
       return data ?? []
     },
   })
@@ -66,6 +71,8 @@ export function GRNForm() {
   const { register, handleSubmit, reset, control, watch, setValue, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
+      po_id: "",
+      warehouse_id: "",
       grn_date: new Date().toISOString().split("T")[0],
       lines: [{ po_line_id: "", received_qty: 0, batch_no: "", photos: [] }],
     },
@@ -79,12 +86,19 @@ export function GRNForm() {
     queryFn: async () => {
       const { data } = await supabase
         .from("po_lines")
-        .select("id, qty, spare_parts(sku, name)")
+        .select("id, qty, part_id, spare_parts(sku, name)")
         .eq("po_id", selectedPoId!)
       return data ?? []
     },
     enabled: !!selectedPoId,
   })
+
+  // Reset line items when PO changes so stale po_line_id selections are cleared
+  useEffect(() => {
+    if (selectedPoId && !isEdit) {
+      setValue("lines", [{ po_line_id: "", received_qty: 0, batch_no: "", photos: [] }])
+    }
+  }, [selectedPoId, isEdit, setValue])
 
   useEffect(() => {
     if (grn) reset({ po_id: grn.po_id, warehouse_id: grn.warehouse_id, grn_date: grn.grn_date, lines: grn.grn_lines ?? [] })
@@ -93,17 +107,30 @@ export function GRNForm() {
   const mutation = useMutation({
     mutationFn: async (values: FormValues) => {
       const { lines, ...header } = values
+
+      // Build a po_line_id → part_id lookup from the already-fetched poLines
+      const partIdByPoLine: Record<string, string> = {}
+      for (const pl of poLines as any[]) {
+        if (pl.id && pl.part_id) partIdByPoLine[pl.id] = pl.part_id
+      }
+
+      const enrichLine = (l: typeof lines[number], grnId: string) => ({
+        ...l,
+        grn_id:  grnId,
+        part_id: l.po_line_id ? (partIdByPoLine[l.po_line_id] ?? null) : null,
+      })
+
       if (isEdit) {
         const { error } = await supabase.from("grns").update({ ...header, status: "Received" }).eq("id", id!)
         if (error) throw error
         await supabase.from("grn_lines").delete().eq("grn_id", id!)
-        await supabase.from("grn_lines").insert(lines.map((l) => ({ ...l, grn_id: id })))
+        await supabase.from("grn_lines").insert(lines.map((l) => enrichLine(l, id!)))
       } else {
         const { data, error } = await supabase.from("grns")
           .insert({ ...header, status: "Draft", created_by: user?.id })
           .select().single()
         if (error) throw error
-        await supabase.from("grn_lines").insert(lines.map((l) => ({ ...l, grn_id: data.id })))
+        await supabase.from("grn_lines").insert(lines.map((l) => enrichLine(l, data.id)))
       }
     },
     onSuccess: () => {
@@ -135,7 +162,14 @@ export function GRNForm() {
             <Field label="Purchase Order" required error={errors.po_id?.message}>
               <Select {...register("po_id")} disabled={isReadOnly}>
                 <option value="">Select PO…</option>
-                {openPOs.map((po: any) => <option key={po.id} value={po.id}>PO-{po.id.slice(0, 8).toUpperCase()} — {po.vendors?.legal_name}</option>)}
+                {openPOs.length === 0
+                  ? <option disabled>No open purchase orders</option>
+                  : openPOs.map((po: any) => (
+                      <option key={po.id} value={po.id}>
+                        {po.po_no ?? `PO-${po.id.slice(0, 8).toUpperCase()}`} — {po.vendors?.legal_name ?? "Unknown vendor"}
+                      </option>
+                    ))
+                }
               </Select>
             </Field>
             <Field label="Warehouse" required error={errors.warehouse_id?.message}>
@@ -164,9 +198,16 @@ export function GRNForm() {
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   <Field label="PO Line (Part)" error={(errors.lines?.[i] as any)?.po_line_id?.message}>
-                    <Select {...register(`lines.${i}.po_line_id`)} disabled={isReadOnly}>
-                      <option value="">Select…</option>
-                      {poLines.map((pl: any) => <option key={pl.id} value={pl.id}>{pl.spare_parts?.sku} — {pl.spare_parts?.name} (Ordered: {pl.qty})</option>)}
+                    <Select {...register(`lines.${i}.po_line_id`)} disabled={isReadOnly || !selectedPoId}>
+                      <option value="">{selectedPoId ? "Select…" : "Select a PO first"}</option>
+                      {poLines.length === 0 && selectedPoId
+                        ? <option disabled>No lines on this PO</option>
+                        : poLines.map((pl: any) => (
+                            <option key={pl.id} value={pl.id}>
+                              {pl.spare_parts?.sku} — {pl.spare_parts?.name} (Ordered: {pl.qty})
+                            </option>
+                          ))
+                      }
                     </Select>
                   </Field>
                   <Field label="Received Qty" error={(errors.lines?.[i] as any)?.received_qty?.message}>

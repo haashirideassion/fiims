@@ -16,7 +16,7 @@ const schema = z.object({
   msme_flag: z.boolean(),
   udyam_no: z.string().optional(),
   credit_terms: z.coerce.number<number>().min(0).max(180).optional(),
-  status: z.enum(["Active", "Blacklisted", "Under Review"]),
+  status: z.enum(["Approved", "Probation", "Blacklisted"]),
 })
 type FormValues = z.infer<typeof schema>
 
@@ -37,7 +37,7 @@ export function VendorForm() {
 
   const { register, handleSubmit, reset, watch, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { msme_flag: false, status: "Active", credit_terms: 30 },
+    defaultValues: { msme_flag: false, status: "Approved", credit_terms: 30 },
   })
 
   useEffect(() => {
@@ -86,9 +86,9 @@ export function VendorForm() {
             </Field>
             <Field label="Status" error={errors.status?.message}>
               <Select {...register("status")}>
-                <option>Active</option>
-                <option>Under Review</option>
-                <option>Blacklisted</option>
+                <option value="Approved">Approved</option>
+                <option value="Probation">Probation</option>
+                <option value="Blacklisted">Blacklisted</option>
               </Select>
             </Field>
           </div>

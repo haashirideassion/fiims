@@ -11,13 +11,13 @@ import { toast } from "sonner"
 import { RiAddLine, RiDeleteBinLine } from "@remixicon/react"
 
 const lineSchema = z.object({
-  part_id: z.string().uuid(),
+  part_id: z.string().min(1, "Please select a part"),
   uom: z.string().min(1),
   price: z.coerce.number<number>().min(0),
 })
 
 const schema = z.object({
-  vendor_id: z.string().uuid(),
+  vendor_id: z.string().min(1, "Please select a vendor"),
   valid_from: z.string(),
   valid_until: z.string(),
   status: z.enum(["Draft", "Active", "Expired"]),
@@ -35,7 +35,7 @@ export function ContractForm() {
   const { data: vendors = [] } = useQuery({
     queryKey: ["vendors-select"],
     queryFn: async () => {
-      const { data } = await supabase.from("vendors").select("id, legal_name").eq("status", "Active").order("legal_name")
+      const { data } = await supabase.from("vendors").select("id, legal_name").in("status", ["Approved"]).order("legal_name")
       return data ?? []
     },
   })
@@ -63,7 +63,7 @@ export function ContractForm() {
 
   const { register, handleSubmit, reset, control, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { status: "Draft", lines: [{ part_id: "", uom: "Nos", price: 0 }] },
+    defaultValues: { vendor_id: "", status: "Draft", lines: [{ part_id: "", uom: "Nos", price: 0 }] },
   })
 
   const { fields, append, remove } = useFieldArray({ control, name: "lines" })

@@ -57,8 +57,10 @@ const TransferList = lazy(() => import("./features/outward/transfers/TransferLis
 const TransferForm = lazy(() => import("./features/outward/transfers/TransferForm").then(m => ({ default: m.TransferForm })))
 const ScrapList = lazy(() => import("./features/outward/scrap/ScrapList").then(m => ({ default: m.ScrapList })))
 const ScrapForm = lazy(() => import("./features/outward/scrap/ScrapForm").then(m => ({ default: m.ScrapForm })))
+const ScrapDetail = lazy(() => import("./features/outward/scrap/ScrapDetail").then(m => ({ default: m.ScrapDetail })))
 const ReturnList = lazy(() => import("./features/outward/returns/ReturnList").then(m => ({ default: m.ReturnList })))
 const ReturnForm = lazy(() => import("./features/outward/returns/ReturnForm").then(m => ({ default: m.ReturnForm })))
+const ReturnDetail = lazy(() => import("./features/outward/returns/ReturnDetail").then(m => ({ default: m.ReturnDetail })))
 
 // Vendor Performance
 const ScorecardList = lazy(() => import("./features/vendor-performance/ScorecardList").then(m => ({ default: m.ScorecardList })))
@@ -151,8 +153,10 @@ export const router = createBrowserRouter([
       { path: "outward/transfers/:id", element: page(TransferForm) },
       { path: "outward/scrap", element: page(ScrapList) },
       { path: "outward/scrap/new", element: page(ScrapForm) },
+      { path: "outward/scrap/:id", element: page(ScrapDetail) },
       { path: "outward/returns", element: page(ReturnList) },
       { path: "outward/returns/new", element: page(ReturnForm) },
+      { path: "outward/returns/:id", element: page(ReturnDetail) },
 
       // Vendor Performance
       { path: "vendor-performance", element: page(ScorecardList) },

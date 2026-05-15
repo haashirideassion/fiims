@@ -1,7 +1,8 @@
-import { RiBellLine, RiSearchLine, RiGlobalLine } from "@remixicon/react"
+import { RiBellLine, RiGlobalLine } from "@remixicon/react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "@/features/auth/useAuth"
+import { GlobalSearch } from "./GlobalSearch"
 
 export function TopBar() {
   const { user } = useAuth()
@@ -16,14 +17,7 @@ export function TopBar() {
 
   return (
     <header className="h-14 bg-[var(--color-bg-white-0)] border-b border-[var(--color-border-soft-200)] flex items-center justify-between px-4 shrink-0">
-      {/* Search */}
-      <div className="flex items-center gap-2 bg-[var(--color-bg-weak-50)] rounded-lg px-3 py-1.5 w-64">
-        <RiSearchLine className="w-4 h-4 text-[var(--color-text-soft-400)]" />
-        <input
-          placeholder="Search parts, vehicles…"
-          className="bg-transparent text-sm text-[var(--color-text-strong-950)] placeholder:text-[var(--color-text-soft-400)] focus:outline-none flex-1"
-        />
-      </div>
+      <GlobalSearch />
 
       <div className="flex items-center gap-2">
         {/* Language toggle — only for store_manager and maintenance_lead */}

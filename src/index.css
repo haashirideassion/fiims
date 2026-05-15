@@ -308,31 +308,33 @@
   --color-black-alpha-10: ;
 
   /* AlignUI Dynamic Neutral Colors */
-  --color-neutral-950: var(--color--950);
-  --color-neutral-900: var(--color--900);
-  --color-neutral-800: var(--color--800);
-  --color-neutral-700: var(--color--700);
-  --color-neutral-600: var(--color--600);
-  --color-neutral-500: var(--color--500);
-  --color-neutral-400: var(--color--400);
-  --color-neutral-300: var(--color--300);
-  --color-neutral-200: var(--color--200);
-  --color-neutral-100: var(--color--100);
-  --color-neutral-50: var(--color--50);
-  --color-neutral-0: var(--color--0);
-  --color-neutral-alpha-24: var(--color--alpha-24);
-  --color-neutral-alpha-16: var(--color--alpha-16);
-  --color-neutral-alpha-10: var(--color--alpha-10);
+  --color-neutral-950: var(--color-gray-950);
+  --color-neutral-900: var(--color-gray-900);
+  --color-neutral-800: var(--color-gray-800);
+  --color-neutral-700: var(--color-gray-700);
+  --color-neutral-600: var(--color-gray-600);
+  --color-neutral-500: var(--color-gray-500);
+  --color-neutral-400: var(--color-gray-400);
+  --color-neutral-300: var(--color-gray-300);
+  --color-neutral-200: var(--color-gray-200);
+  --color-neutral-100: var(--color-gray-100);
+  --color-neutral-50: var(--color-gray-50);
+  --color-neutral-0: var(--color-gray-0);
+  --color-neutral-alpha-24: var(--color-gray-alpha-24);
+  --color-neutral-alpha-16: var(--color-gray-alpha-16);
+  --color-neutral-alpha-10: var(--color-gray-alpha-10);
 
   /* AlignUI Dynamic Primary Colors */
-  --color-primary-dark: var(--color--800);
-  --color-primary-darker: var(--color--700);
-  --color-primary-base: var(--color--);
-  --color-primary-light: var(--color--100);
-  --color-primary-lighter: var(--color--50);
-  --color-primary-alpha-24: var(--color--alpha-24);
-  --color-primary-alpha-16: var(--color--alpha-16);
-  --color-primary-alpha-10: var(--color--alpha-10);
+  --color-primary-dark: var(--color-blue-800);
+  --color-primary-darker: var(--color-blue-700);
+  --color-primary-base: var(--color-blue-500);
+  --color-primary-light: var(--color-blue-100);
+  --color-primary-lighter: var(--color-blue-50);
+  --color-primary-alpha-24: var(--color-blue-alpha-24);
+  --color-primary-alpha-16: var(--color-blue-alpha-16);
+  --color-primary-alpha-10: var(--color-blue-alpha-10);
+  --color-primary-500: var(--color-blue-500);
+  --color-primary-600: var(--color-blue-600);
 
   /* AlignUI Social Colors */
   --color-social-apple: ;
@@ -370,6 +372,8 @@
   --color-stroke-sub-300: var(--color-neutral-300);
   --color-stroke-soft-200: var(--color-neutral-200);
   --color-stroke-white-0: var(--color-neutral-0);
+
+  --color-border-soft-200: var(--color-neutral-200);
 
   --color-faded-dark: var(--color-neutral-800);
   --color-faded-base: var(--color-neutral-500);
@@ -523,9 +527,9 @@
     --color-stable-light: var(--color-teal-alpha-24);
     --color-stable-lighter: var(--color-teal-alpha-16);
 
-    --color-primary-base: var(--color--);
-    --color-primary-light: var(--color--alpha-16);
-    --color-primary-lighter: var(--color--alpha-10);
+    --color-primary-base: var(--color-blue-500);
+    --color-primary-light: var(--color-blue-alpha-16);
+    --color-primary-lighter: var(--color-blue-alpha-10);
 
     --color-overlay-gray: ;
     --color-overlay-slate: ;
@@ -616,9 +620,9 @@
   --color-stable-light: var(--color-teal-alpha-24);
   --color-stable-lighter: var(--color-teal-alpha-16);
 
-  --color-primary-base: var(--color--);
-  --color-primary-light: var(--color--alpha-16);
-  --color-primary-lighter: var(--color--alpha-10);
+  --color-primary-base: var(--color-blue-500);
+  --color-primary-light: var(--color-blue-alpha-16);
+  --color-primary-lighter: var(--color-blue-alpha-10);
 
   --color-overlay-gray: ;
   --color-overlay-slate: ;

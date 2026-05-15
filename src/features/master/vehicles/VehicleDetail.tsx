@@ -48,11 +48,14 @@ export function VehicleDetail() {
   if (isLoading) return <div className="h-40 flex items-center justify-center text-sm text-[var(--color-text-soft-400)]">Loading…</div>
   if (!vehicle) return null
 
+
   return (
     <div className="space-y-5 max-w-3xl">
       <PageHeader
         title={vehicle.reg_no}
         description={`${vehicle.vehicle_models?.make} ${vehicle.vehicle_models?.model} · ${vehicle.zone}`}
+        backTo="/master/vehicles"
+        backLabel="Vehicles"
         actions={
           <Link to={`/master/vehicles/${id}/edit`} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--color-border-soft-200)] text-sm text-[var(--color-text-sub-600)] hover:bg-[var(--color-bg-soft-200)] transition">
             <RiPencilLine className="w-4 h-4" /> Edit

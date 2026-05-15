@@ -29,11 +29,14 @@ export const useAuthStore = create<AuthState>()(
         if (error) return { error: error.message }
         if (!data.session) return { error: "No session returned" }
 
-        const { data: profile } = await supabase
+        const { data: profile, error: profileErr } = await supabase
           .from("users")
           .select("*")
           .eq("id", data.user.id)
-          .single()
+          .maybeSingle()
+
+        if (profileErr) return { error: profileErr.message }
+        if (!profile) return { error: "User profile not found. Ask your administrator to create your account in FIIMS." }
 
         set({
           session: { access_token: data.session.access_token },
@@ -62,7 +65,7 @@ export function useAuth() {
           .from("users")
           .select("*")
           .eq("id", data.session.user.id)
-          .single()
+          .maybeSingle()
           .then(({ data: profile }: { data: any }) => {
             setUser(profile as unknown as AppUser)
             setLoading(false)

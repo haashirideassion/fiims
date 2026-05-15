@@ -1,3 +1,4 @@
+import { forwardRef } from "react"
 import type { InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes } from "react"
 import { cn } from "@/lib/utils/cn"
 
@@ -21,9 +22,10 @@ export function Field({ label, error, required, children, className }: FieldProp
   )
 }
 
-export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
-  return (
+export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
+  ({ className, ...props }, ref) => (
     <input
+      ref={ref}
       className={cn(
         "w-full px-3 py-2 rounded-lg border border-[var(--color-border-soft-200)] bg-[var(--color-bg-white-0)] text-sm text-[var(--color-text-strong-950)] placeholder:text-[var(--color-text-soft-400)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)] focus:border-transparent transition",
         className
@@ -31,11 +33,13 @@ export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElem
       {...props}
     />
   )
-}
+)
+Input.displayName = "Input"
 
-export function Select({ className, children, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
+export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement>>(
+  ({ className, children, ...props }, ref) => (
     <select
+      ref={ref}
       className={cn(
         "w-full px-3 py-2 rounded-lg border border-[var(--color-border-soft-200)] bg-[var(--color-bg-white-0)] text-sm text-[var(--color-text-strong-950)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)] transition",
         className
@@ -45,11 +49,13 @@ export function Select({ className, children, ...props }: SelectHTMLAttributes<H
       {children}
     </select>
   )
-}
+)
+Select.displayName = "Select"
 
-export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(
+  ({ className, ...props }, ref) => (
     <textarea
+      ref={ref}
       rows={3}
       className={cn(
         "w-full px-3 py-2 rounded-lg border border-[var(--color-border-soft-200)] bg-[var(--color-bg-white-0)] text-sm text-[var(--color-text-strong-950)] placeholder:text-[var(--color-text-soft-400)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)] focus:border-transparent transition resize-none",
@@ -58,7 +64,8 @@ export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTex
       {...props}
     />
   )
-}
+)
+Textarea.displayName = "Textarea"
 
 export function FormCard({ title, children }: { title?: string; children: React.ReactNode }) {
   return (

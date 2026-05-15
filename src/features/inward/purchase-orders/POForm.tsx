@@ -17,14 +17,14 @@ import { RiAddLine, RiDeleteBinLine } from "@remixicon/react"
 import type { ApprovalEvent } from "@/lib/types"
 
 const lineSchema = z.object({
-  part_id: z.string().uuid(),
+  part_id: z.string().min(1, "Please select a part"),
   qty: z.coerce.number<number>().min(1),
   unit_price: z.coerce.number<number>().min(0),
-  destination_warehouse_id: z.string().uuid(),
+  destination_warehouse_id: z.string().min(1, "Please select a warehouse"),
 })
 
 const schema = z.object({
-  vendor_id: z.string().uuid(),
+  vendor_id: z.string().min(1, "Please select a vendor"),
   lines: z.array(lineSchema).min(1, "Add at least one line"),
 })
 type FormValues = z.infer<typeof schema>
@@ -40,7 +40,12 @@ export function POForm() {
   const { data: vendors = [] } = useQuery({
     queryKey: ["vendors-select"],
     queryFn: async () => {
-      const { data } = await supabase.from("vendors").select("id, legal_name").eq("status", "Active").order("legal_name")
+      // Vendors use "Approved" status (not "Active") — filter to show only approvable vendors
+      const { data } = await supabase
+        .from("vendors")
+        .select("id, legal_name")
+        .in("status", ["Approved"])
+        .order("legal_name")
       return data ?? []
     },
   })
@@ -72,7 +77,7 @@ export function POForm() {
 
   const { register, handleSubmit, reset, control, watch, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { lines: [{ part_id: "", qty: 1, unit_price: 0, destination_warehouse_id: "" }] },
+    defaultValues: { vendor_id: "", lines: [{ part_id: "", qty: 1, unit_price: 0, destination_warehouse_id: "" }] },
   })
 
   const { fields, append, remove } = useFieldArray({ control, name: "lines" })
@@ -128,7 +133,10 @@ export function POForm() {
           <Field label="Vendor" required error={errors.vendor_id?.message}>
             <Select {...register("vendor_id")} disabled={isReadOnly}>
               <option value="">Select vendor…</option>
-              {vendors.map((v: any) => <option key={v.id} value={v.id}>{v.legal_name}</option>)}
+              {vendors.length === 0
+                ? <option disabled>No approved vendors available</option>
+                : vendors.map((v: any) => <option key={v.id} value={v.id}>{v.legal_name}</option>)
+              }
             </Select>
           </Field>
         </FormCard>
@@ -138,7 +146,7 @@ export function POForm() {
             {fields.map((field, i) => (
               <div key={field.id} className="grid grid-cols-12 gap-3 items-end">
                 <div className="col-span-4">
-                  <Field label={i === 0 ? "Part" : ""}>
+                  <Field label={i === 0 ? "Part" : ""} error={(errors.lines?.[i] as any)?.part_id?.message}>
                     <Select {...register(`lines.${i}.part_id`)} disabled={isReadOnly}>
                       <option value="">Select part…</option>
                       {parts.map((p: any) => <option key={p.id} value={p.id}>{p.sku} — {p.name}</option>)}
@@ -156,7 +164,7 @@ export function POForm() {
                   </Field>
                 </div>
                 <div className="col-span-3">
-                  <Field label={i === 0 ? "Destination WH" : ""}>
+                  <Field label={i === 0 ? "Destination WH" : ""} error={(errors.lines?.[i] as any)?.destination_warehouse_id?.message}>
                     <Select {...register(`lines.${i}.destination_warehouse_id`)} disabled={isReadOnly}>
                       <option value="">Select…</option>
                       {warehouses.map((w: any) => <option key={w.id} value={w.id}>{w.name}</option>)}

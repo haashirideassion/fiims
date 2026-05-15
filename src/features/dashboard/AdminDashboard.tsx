@@ -11,7 +11,7 @@ export function AdminDashboard() {
     queryKey: ["admin-stats"],
     queryFn: async () => {
       const [vendors, vehicles, warehouses, openPOs] = await Promise.all([
-        supabase.from("vendors").select("*", { count: "exact", head: true }).eq("status", "Active"),
+        supabase.from("vendors").select("*", { count: "exact", head: true }).eq("status", "Approved"),
         supabase.from("vehicles").select("*", { count: "exact", head: true }),
         supabase.from("warehouses").select("*", { count: "exact", head: true }),
         supabase.from("purchase_orders").select("*", { count: "exact", head: true }).eq("status", "Issued"),

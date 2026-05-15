@@ -16,13 +16,13 @@ import { RiAddLine, RiDeleteBinLine } from "@remixicon/react"
 import type { ApprovalEvent } from "@/lib/types"
 
 const lineSchema = z.object({
-  part_id: z.string().uuid(),
+  part_id: z.string().min(1, "Please select a part"),
   qty_dispatched: z.coerce.number<number>().min(1),
 })
 
 const schema = z.object({
-  source_wh: z.string().uuid(),
-  dest_wh: z.string().uuid(),
+  source_wh: z.string().min(1, "Please select a source warehouse"),
+  dest_wh: z.string().min(1, "Please select a destination warehouse"),
   lines: z.array(lineSchema).min(1),
 })
 type FormValues = z.infer<typeof schema>
@@ -62,7 +62,7 @@ export function TransferForm() {
 
   const { register, handleSubmit, reset, control, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { lines: [{ part_id: "", qty_dispatched: 1 }] },
+    defaultValues: { source_wh: "", dest_wh: "", lines: [{ part_id: "", qty_dispatched: 1 }] },
   })
 
   const { fields, append, remove } = useFieldArray({ control, name: "lines" })
@@ -100,7 +100,12 @@ export function TransferForm() {
 
   return (
     <div className="space-y-5 max-w-3xl">
-      <PageHeader title={isEdit ? `Transfer TRF-${id?.slice(0, 8).toUpperCase()}` : "New Transfer"} actions={isEdit && <StatusBadge status={transfer?.status ?? "Requested"} />} />
+      <PageHeader
+        title={isEdit ? `Transfer TRF-${id?.slice(0, 8).toUpperCase()}` : "New Transfer"}
+        backTo="/outward/transfers"
+        backLabel="Transfers"
+        actions={isEdit && <StatusBadge status={transfer?.status ?? "Requested"} />}
+      />
       <form onSubmit={handleSubmit((v) => mutation.mutate(v))} className="space-y-5">
         <FormCard title="Route">
           <div className="grid grid-cols-2 gap-4">

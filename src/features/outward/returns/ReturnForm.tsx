@@ -14,14 +14,14 @@ import { RiAddLine, RiDeleteBinLine } from "@remixicon/react"
 const CONDITIONS = ["Reusable", "Needs Repair", "Scrap"]
 
 const lineSchema = z.object({
-  part_id: z.string().uuid(),
+  part_id: z.string().min(1, "Please select a part"),
   qty: z.coerce.number<number>().min(1),
   condition_code: z.string().min(1),
 })
 
 const schema = z.object({
-  min_id: z.string().uuid().optional(),
-  warehouse_id: z.string().uuid(),
+  min_id: z.string().optional(),
+  warehouse_id: z.string().min(1, "Please select a warehouse"),
   return_date: z.string(),
   lines: z.array(lineSchema).min(1),
 })

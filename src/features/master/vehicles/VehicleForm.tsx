@@ -16,7 +16,7 @@ const schema = z.object({
   reg_no: z.string().min(5),
   chassis_no: z.string().min(5),
   engine_no: z.string().min(5),
-  model_id: z.string().uuid(),
+  model_id: z.string().min(1, "Please select a model"),
   zone: z.string().min(1),
   year: z.coerce.number<number>().min(2000).max(2030),
   gps_id: z.string().optional(),
@@ -52,7 +52,7 @@ export function VehicleForm() {
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { status: "Active", year: new Date().getFullYear() },
+    defaultValues: { model_id: "", zone: "", status: "Active", year: new Date().getFullYear() },
   })
 
   useEffect(() => {

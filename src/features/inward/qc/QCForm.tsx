@@ -12,7 +12,7 @@ import { useAuth } from "@/features/auth/useAuth"
 import { toast } from "sonner"
 
 const lineSchema = z.object({
-  grn_line_id: z.string().uuid(),
+  grn_line_id: z.string().min(1),
   accepted_qty: z.coerce.number<number>().min(0),
   rejected_qty: z.coerce.number<number>().min(0),
   reason_code: z.string().optional(),

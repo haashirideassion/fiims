@@ -14,8 +14,8 @@ import { toast } from "sonner"
 const SCRAP_REASONS = ["End of Life", "Damaged Beyond Repair", "Obsolete Part", "Expired Shelf Life", "Condemned After Accident", "Quality Rejection"]
 
 const schema = z.object({
-  warehouse_id: z.string().uuid(),
-  part_id: z.string().uuid(),
+  warehouse_id: z.string().min(1, "Please select a warehouse"),
+  part_id: z.string().min(1, "Please select a part"),
   batch_no: z.string().optional(),
   qty: z.coerce.number<number>().min(1),
   reason_code: z.string().min(1),
@@ -48,7 +48,7 @@ export function ScrapForm() {
 
   const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { warehouse_id: scopedWarehouseId() ?? "", photos: [] },
+    defaultValues: { warehouse_id: scopedWarehouseId() ?? "", part_id: "", photos: [] },
   })
 
   const mutation = useMutation({
